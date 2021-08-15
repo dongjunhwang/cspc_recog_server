@@ -6,4 +6,8 @@ db.sqlite3
 /static
 .DS_Store
 
+
+cspc_recog_server/**/migrations/
+!cspc_recog_server/**/migrations/__init__.py
+
 venv/
