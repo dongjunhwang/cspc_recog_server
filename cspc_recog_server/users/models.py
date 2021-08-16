@@ -1,20 +1,21 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
-
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    lastVisitTime = models.DateTimeField(auto_now=True)  # 저장시 자동 시간 업데이트
-    isOnline = models.BooleanField(default=False)
+class Group(models.Model):
+    group_name = models.CharField(max_length=100)
+    #group_admin_id = models.ForeignKey(Profile,on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.user.username
+        return self.group_name
 
+class Profile(models.Model):
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    club_id = models.ForeignKey(Group,on_delete=models.CASCADE)
+    nick_name = models.CharField(max_length=100)
+    last_visit_time = models.DateTimeField(auto_now=True)  # 저장시 자동 시간 업데이트
+    is_online = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
 
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-    instance.profile.save()
+    def __str__(self):
+        return self.nick_name
+
