@@ -1,13 +1,29 @@
 from users.models import Profile
+from users.serializers import ProfileSerializer
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import FaceSerializer
 from .models import Face
-class FaceRecog(APIView):
-    def post(self,request):
+from .deepface import DeepFaceRecog
 
-        return Response("test ok", status=200)
+class FaceRecog(APIView):
+    def post(self, request):
+        # TODO : Group 별로 분리
+        jsonData = request.data[0]
+        image = jsonData['image']
+        try:
+            faces = Face.objects.all()
+            profile = DeepFaceRecog(faces, image)
+            print(profile)
+            profile_serializer = ProfileSerializer(profile)
+            if profile_serializer.is_valid():
+                profile_serializer.object.isOnline = True
+                profile_serializer.save()
+
+            return Response(profile_serializer.data, status=200)
+        except:
+            return Response(status=404)
 
 
 class FaceAdd(APIView):
