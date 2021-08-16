@@ -5,6 +5,6 @@ from .views import HelloAPI, postAPI
 from . import views
 urlpatterns = [
     path("hello/", HelloAPI),
-    path("post/", postAPI),
+    path("post/wow/", postAPI),
     path('post/<int:pk>', views.commentAPI),
 ]
