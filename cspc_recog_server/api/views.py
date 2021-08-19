@@ -7,25 +7,56 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from .models import Post, comment
-from .serializers import PostSerializer, CommentSerializer, PostListSerializer
-
+from .serializers import PostSerializer, CommentSerializer, PostListSerializer, LikeSerializer
+import json
 # Create your views here.
-@api_view(['GET'])
-def HelloAPI(request):
-    return Response("hello world!")
+
+class PostList(APIView):
+
+    #게시물 목록 받아오기
+    def get(self, request,pk):
+        all_post = Post.objects.filter(board_id = pk)
+        serializer = PostListSerializer(all_post, many=True)
+        return Response(serializer.data)
+
+    #게시물 생성
+    #board_id, id, title, author, contents 필요
+    def post(self, request, pk):
+        serializer = PostListSerializer(data=request.data)
+        #req = json.loads(request.body)
+        print(request.POST['title'])
+        print(request.POST['author'])
+        print(request.POST['contents'])
+        print(request.POST['board_id'])
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class PostLike(APIView):
+    #좋아요 개수
+    def get(self,request,pk):
+        post = Post.objects.get(id = pk)
+        serializer = LikeSerializer(post)
+        return Response(serializer.data)
+
+    #좋아요 누르기
+    #1 증가
+    def post(self, request,pk):
+        print("like 증가",pk)
+        post = Post.objects.get(id=pk)
+        post.like_count += 1
+        post.save()
+        return Response()
 
 @api_view(['GET'])
 def postAPI(request):
-    print("여기!")
-    allPost = Post.objects.all()
-    serializer = PostListSerializer(allPost, many = True)
+    all_post = Post.objects.all()
+    serializer = PostListSerializer(all_post, many = True)
     return Response(serializer.data)
 
 @api_view(['GET'])
 def commentAPI(request,pk):
-    print("여기!111")
-    #allPost = Post.objects.all()
-    #serializer = PostListSerializer(allPost, many=True)
 
     try:
         # pk(인스턴스의 id)값을 받아 어떤 인스턴스인지 특정
