@@ -1,6 +1,6 @@
 # api/urls.py
 
-from django.urls import path, include
+from django.urls import path
 from . import views
 urlpatterns = [
     path("board/<int:pk>", views.PostList.as_view()),
