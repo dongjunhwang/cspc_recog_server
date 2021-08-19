@@ -1,30 +1,37 @@
 from users.models import Profile
-from users.serializers import ProfileSerializer
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import FaceSerializer
 from .models import Face
 from .deepface import DeepFaceRecog
 
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+
 class FaceRecog(APIView):
     def post(self, request):
         # TODO : Group 별로 분리
         jsonData = request.data[0]
         image = jsonData['image']
-        #try:
-        faces = Face.objects.all()
-        profile = DeepFaceRecog(faces, image)
-        print(profile)
-        profile_serializer = ProfileSerializer(profile, isOnline=True)
-        #TODO : 여기서 부터 잘 안됌.
-        if profile_serializer.is_valid():
-            profile_serializer.object.isOnline = True
-            profile_serializer.save()
-
-        return Response(profile_serializer.data, status=200)
-        #except:
-        #    return Response(status=404)
+        try:
+            faces = Face.objects.all()
+            profile = DeepFaceRecog(faces, image)
+            if profile.is_online:
+                profile.is_online = False
+            else:
+                profile.is_online = True
+            profile.save()
+            data = {
+                "username": profile.user_id.username,
+                "isOnline": int(profile.is_online),
+                "response": 1
+            }
+            return JsonResponse(data, status=200)
+        except:
+            data = {
+                "response": 0
+            }
+            return Response(data, status=404)
 
 
 class FaceAdd(APIView):
@@ -34,8 +41,11 @@ class FaceAdd(APIView):
         name =jsonData['username']
         image = jsonData['image']
         try:
-            profile = Profile.objects.get(user__username = name)
-            face =Face.objects.create(profile = profile, image_base64 = image)
+            user = User.objects.get(username=name)
+            profile = user.profile.all()[0]
+            #group을 아직 넘기지 않으므로 일단 첫번째 것만 가져오게 된다.
+
+            face =Face.objects.create(profile = profile, image_base64=image)
             face_serializer = FaceSerializer(face)
             return Response(face_serializer.data, status=200)
         except Profile.DoesNotExist:

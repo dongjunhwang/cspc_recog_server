@@ -8,5 +8,5 @@ class Face(models.Model):
     image_base64 = models.TextField()
 
     def __str__(self):
-        return self.profile.user.username
+        return self.profile.user_id.username
 # Create your models here.

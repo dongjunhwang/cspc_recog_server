@@ -7,4 +7,5 @@ class FaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Face
         fields = '__all__'
+
         # Profile의 모든 field를 serializer함.
