@@ -41,11 +41,17 @@ class PostLike(APIView):
         return Response(serializer.data)
 
     #좋아요 누르기
-    #1 증가
     def post(self, request,pk):
-        print("like 증가",pk)
         post = Post.objects.get(id=pk)
-        post.like_count += 1
+        profile = request.POST['profile']
+        # 이미 좋아요를 누른 profile이면 좋아요 삭제
+        if post.like_members.filter(id=profile).exists():
+            #print("삭제")
+            post.like_members.remove(profile)
+        else:
+            #print("추가")
+            post.like_count += 1
+            post.like_members.add(profile)
         post.save()
         return Response()
 

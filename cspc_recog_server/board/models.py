@@ -15,7 +15,7 @@ class Post(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
     like_count = models.IntegerField(default=0)
-    like_members = models.ManyToManyField(Profile,related_name='like_post',blank=True,null=True)
+    like_members = models.ManyToManyField(Profile,related_name='like_post',blank=True)
 
 class Comment(models.Model):
     post_id = models.ForeignKey(Post, on_delete=models.CASCADE)
