@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'face_recog',
     # Board
     'api',
+    # 토큰 인증
+    'knox', 
 ]
 
 MIDDLEWARE = [
