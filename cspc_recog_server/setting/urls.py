@@ -22,4 +22,5 @@ urlpatterns = [
     path('users/', include('users.urls'), name='users'),
     path('face/', include('face_recog.urls'), name='face'),
     path('api/', include("api.urls"), name='api'),
+    path('calendars/', include("calendars.urls"), name='calendars'),
 ]

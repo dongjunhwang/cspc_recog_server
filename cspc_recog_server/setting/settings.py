@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'api',
     # 토큰 인증
     'knox', 
+    # Calendar
+    'calendars',
 ]
 
 MIDDLEWARE = [
