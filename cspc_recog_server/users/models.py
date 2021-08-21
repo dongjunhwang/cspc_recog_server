@@ -18,4 +18,3 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.nick_name
-

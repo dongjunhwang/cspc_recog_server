@@ -41,7 +41,7 @@ class FaceAdd(APIView):
         name =jsonData['username']
         image = jsonData['image']
         try:
-            user = User.objects.get(username=name)
+            user = User.objects.get(username=name) #request.user
             profile = user.profile.all()[0]
             #group을 아직 넘기지 않으므로 일단 첫번째 것만 가져오게 된다.
 
