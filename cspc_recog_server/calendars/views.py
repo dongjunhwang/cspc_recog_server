@@ -2,10 +2,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import Calendar, Event
 from .serializers import CalendarSerializer, EventSerializer
-
-@api_view(['GET'])
-def helloAPI(request):
-    return Response("hello world!")
+import json
 
 @api_view(['GET'])
 def calendarAPI(request):
@@ -15,6 +12,26 @@ def calendarAPI(request):
 
 @api_view(['GET'])
 def eventAPI(request, pk):
-    all_event = Event.objects.filter(calendar_id = pk)
+    all_event = Event.objects.filter(calendar_id = pk).order_by('date')
     serializer = EventSerializer(all_event, many=True)
     return Response(serializer.data)
+
+@api_view(['POST'])
+def eventPostAPI(request, pk):
+    if request.method == 'POST':
+        
+        calendar_id = Calendar.objects.filter(id = pk)[0]
+
+        print(json.loads(request.body))
+        
+        request_data = json.loads(request.body.decode('utf-8'))[0]
+        title = request_data['title']
+        description = request_data['description']
+        date = request_data['date']
+        
+        event = Event(calendar_id = calendar_id,
+        title = title, description = description, date = date
+        )
+        event.save()
+        
+        return Response(True)
