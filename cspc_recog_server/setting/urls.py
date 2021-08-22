@@ -23,4 +23,5 @@ urlpatterns = [
     path('users/', include('users.urls'), name='users'),
     path('face/', include('face_recog.urls'), name='face'),
     path('board/', include("board.urls"), name='board'),
+    path('calendars/', include("calendars.urls"), name='calendars'),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
