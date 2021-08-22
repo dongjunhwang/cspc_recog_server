@@ -4,4 +4,5 @@ from .models import *
 
 admin.site.register(Board)
 admin.site.register(Post)
+admin.site.register(PostImage)
 admin.site.register(Comment)
