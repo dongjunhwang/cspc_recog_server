@@ -58,7 +58,6 @@ class LoginAPI(generics.GenericAPIView):
             }
         )
 
-
 class UserAPI(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
@@ -66,12 +65,19 @@ class UserAPI(generics.RetrieveAPIView):
     def get_object(self):
         return self.request.user
 
+class ProfileCreateAPI(generics.CreateAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+
+class GroupCreateAPI(generics.CreateAPIView):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+
+
 class ProfileUpdateAPI(generics.UpdateAPIView):
-    lookup_field = "id"
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
 
 class GroupUpdateAPI(generics.UpdateAPIView):
-    lookup_field = "id"
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
