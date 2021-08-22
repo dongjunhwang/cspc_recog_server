@@ -3,10 +3,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import ProfileSerializer
 from rest_framework import status , permissions, generics, status
-from .models import Profile
 from knox.models import AuthToken
-from .serializers import CreateUserSerializer, UserSerializer, LoginUserSerializer
-from .models import Profile
+from .serializers import CreateUserSerializer, UserSerializer, LoginUserSerializer, ProfileSerializer, GroupSerializer
+from .models import Profile, Group
 
 
 class UserView(APIView):
@@ -67,3 +66,12 @@ class UserAPI(generics.RetrieveAPIView):
     def get_object(self):
         return self.request.user
 
+class ProfileUpdateAPI(generics.UpdateAPIView):
+    lookup_field = "id"
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+
+class GroupUpdateAPI(generics.UpdateAPIView):
+    lookup_field = "id"
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
