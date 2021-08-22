@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     # Face Recognition
     'face_recog',
     # Board
-    'api',
+    'board',
     # 토큰 인증
     'knox', 
 ]
