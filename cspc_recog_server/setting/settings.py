@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     # Face Recognition
     'face_recog',
     # Board
-    'api',
+    'board',
     # 토큰 인증
     'knox', 
     # Calendar
@@ -137,3 +137,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Store data in media
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
