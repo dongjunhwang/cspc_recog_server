@@ -57,6 +57,7 @@ class PostLike(APIView):
         # 이미 좋아요를 누른 profile이면 좋아요 삭제
         if post.like_members.filter(id=profile).exists():
             #print("삭제")
+            post.like_count -= 1
             post.like_members.remove(profile)
         else:
             #print("추가")
@@ -71,20 +72,29 @@ def PostAPI(request):
     serializer = PostListSerializer(all_post, many = True)
     return Response(serializer.data)
 
-@api_view(['GET'])
-def CommentAPI(request,pk):
+class CommentAPI(APIView):
+    #pk 게시글의 댓글 목록 가져오기
+    def get(self,request,pk):
+        try:
+            # pk(인스턴스의 id)값을 받아 어떤 인스턴스인지 특정
+            # url slug로 pk값을 받도록 urls.py에서 설정해준다.
+            comments = Comment.objects.filter(post_id=pk)
+            # 받은 pk값으로 조회했을 때 해당하는 인스턴스가 없다면 출력할 에러 코드와 메시지를 설정한다.
+        except Comment.DoesNotExist:
+            return Response({'error': {
+                'code': 404,
+                'message': "Comment not found!"
+            }}, status=status.HTTP_404_NOT_FOUND)
 
-    try:
-        # pk(인스턴스의 id)값을 받아 어떤 인스턴스인지 특정
-        # url slug로 pk값을 받도록 urls.py에서 설정해준다.
-        comments = Comment.objects.filter(post_id=pk)
-        # 받은 pk값으로 조회했을 때 해당하는 인스턴스가 없다면 출력할 에러 코드와 메시지를 설정한다.
-    except Comment.DoesNotExist:
-        return Response({'error': {
-            'code': 404,
-            'message': "Comment not found!"
-        }}, status=status.HTTP_404_NOT_FOUND)
+        # comments = comment.objects.filter(post_id = pk)
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
 
-    #comments = comment.objects.filter(post_id = pk)
-    serializer = CommentSerializer(comments, many = True)
-    return Response(serializer.data)
+    #게시글에 댓글 올리기
+    #post_id, author, contents 필요
+    def post(self,request):
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
