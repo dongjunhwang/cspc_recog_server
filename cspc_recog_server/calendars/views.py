@@ -35,3 +35,11 @@ def eventPostAPI(request, pk):
         event.save()
         
         return Response(True)
+
+@api_view(['DELETE'])
+def eventDeleteAPI(request, cal_id, event_id):
+    if request.method == 'DELETE':
+        event = Event.objects.filter(id=event_id).delete()
+        
+        print(event)
+        return Response("deleted")
