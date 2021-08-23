@@ -14,6 +14,7 @@ class Group(models.Model):
     def __str__(self):
         return self.group_name
 
+
 class Profile(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='profile')
     group_id = models.ForeignKey(Group, on_delete=models.CASCADE)

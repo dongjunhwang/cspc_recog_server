@@ -1,12 +1,11 @@
 from django.db import models
-
+from users.models import Group, Profile
+from django.contrib.auth.models import User
 # Create your models here.
-class Club(models.Model):
-    club_name = models.CharField(max_length=30)
 
 class Board(models.Model):
     board_name = models.CharField(max_length=30)
-    club_id = models.ForeignKey(Club,on_delete=models.CASCADE)
+    group_id = models.ForeignKey(Group,on_delete=models.CASCADE)
 
 class Post(models.Model):
     board_id = models.ForeignKey(Board, on_delete=models.CASCADE, related_name='board',default='')
@@ -16,8 +15,15 @@ class Post(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
     like_count = models.IntegerField(default=0)
+    like_members = models.ManyToManyField(Profile,related_name='like_post',blank=True)
+    has_image = models.BooleanField(default=False)
 
-class comment(models.Model):
+class PostImage(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    # 이미지 업로드 날짜에 따라 디렉토리에 저장
+    image = models.ImageField(upload_to='post/%y/%m/%d')
+
+class Comment(models.Model):
     post_id = models.ForeignKey(Post, on_delete=models.CASCADE)
     author = models.CharField(max_length=10, null=False)
     contents = models.TextField(null = False)
