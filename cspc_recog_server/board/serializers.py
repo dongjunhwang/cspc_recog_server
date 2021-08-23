@@ -34,3 +34,12 @@ class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('id','like_count')
+
+class BoardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Board
+        fields = ('board_name','group_id')
+
+    def create(self, validated_data):
+        board = Board.objects.create(**validated_data)
+        return board

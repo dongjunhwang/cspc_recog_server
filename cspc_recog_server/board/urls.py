@@ -7,4 +7,5 @@ urlpatterns = [
     path('comment/<int:pk>', views.CommentAPI.as_view()),
     path('like/<int:pk>',views.PostLike.as_view()),
     path('image/<int:pk>',views.PostImageAPI.as_view()),
+    path('newboard',views.BoardAPI.as_view()),
 ]
