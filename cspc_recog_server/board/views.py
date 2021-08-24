@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from .models import Post, Comment, PostImage, Board
-from .serializers import PostSerializer, CommentSerializer, PostListSerializer, LikeSerializer, PostImageSerializer, BoardSerializer
+from .serializers import PostSerializer, CommentSerializer, LikeSerializer, PostImageSerializer, BoardSerializer
 import json
 # Create your views here.
 
@@ -34,8 +34,16 @@ class PostList(APIView):
                     post.save()
                     image_flag = True
                 PostImage.objects.create(post_id=post.id, image=image)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+            return Response(data=post.id, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class PostAPI(APIView):
+    # 게시물 목록 받아오기
+    def get(self, request, pk):
+        post = Post.objects.get(id=pk)
+        serializer = PostSerializer(post)
+        return Response(serializer.data)
 
 class PostImageAPI(APIView):
     def get(self, request, pk):
@@ -66,12 +74,6 @@ class PostLike(APIView):
         post.save()
         return Response()
 
-@api_view(['GET'])
-def PostAPI(request):
-    all_post = Post.objects.all()
-    serializer = PostListSerializer(all_post, many = True)
-    return Response(serializer.data)
-
 class CommentAPI(APIView):
     #pk 게시글의 댓글 목록 가져오기
     def get(self,request,pk):
@@ -92,15 +94,23 @@ class CommentAPI(APIView):
 
     #게시글에 댓글 올리기
     #post_id, author, contents 필요
-    def post(self,request):
+    def post(self,request,pk):
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class BoardAPI(APIView):
+    #group_id에 해당하는 board 목록 가져오기
+    def get(self,request,pk):
+        all_board = Board.objects.filter(group_id = pk)
+        serializer = BoardSerializer(all_board, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    #보드 생성
+    #group_id, board_name 필요
     def post(self,request):
         serializer = BoardSerializer(data=request.data)
         if serializer.is_valid():
