@@ -18,28 +18,30 @@ class FaceRecog(APIView):
         image = jsonData['image']
 
 
-        try:
-            faces = Face.objects.all()
-            profile = DeepFaceRecog(faces, image)
-            if profile.is_online:
-                    # 누적 visit time 저장
-                profile.visit_time_sum += datetime.now(timezone('Asia/Seoul')) - profile.last_visit_time
-                profile.is_online = False
-            else:
-                profile.last_visit_time = datetime.now()
-                profile.is_online = True
-            profile.save()
-            data = {
-                "username": profile.user_id.username,
-                "isOnline": int(profile.is_online),
-                "response": 1
-            }
-            return JsonResponse(data, status=200)
+        faces = Face.objects.all()
+        profile = DeepFaceRecog(faces, image)
+        if profile.is_online:
+            # 누적 visit time 저장
+            profile.visit_time_sum += datetime.now(timezone('Asia/Seoul')) - profile.last_visit_time
+            profile.is_online = False
+        else:
+            profile.last_visit_time = datetime.now()
+            profile.is_online = True
+        profile.save()
+        data = {
+            "username": profile.user_id.username,
+            "isOnline": int(profile.is_online),
+            "response": 1
+        }
+        return JsonResponse(data, status=200)
+        # TODO : 완벽하게 만들어서 배포할 때 까지  try except 키지 말기
+        """
         except:
             data = {
                 "response": 0
             }
             return Response(data, status=404)
+        """
 
 
 class FaceAdd(APIView):

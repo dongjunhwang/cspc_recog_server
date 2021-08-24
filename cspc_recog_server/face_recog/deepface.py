@@ -1,9 +1,12 @@
-from deepface import DeepFace
+from .deepface_basic import DeepFace
+import time
 #DeepFace.stream("database")
 
 def DeepFaceRecog(faces, image):
+    start = time.time()
     true_face_dict = {}
     backends = ['opencv', 'ssd', 'dlib', 'mtcnn', 'retinaface']
+    #model_name = "Facenet"
     model_name = "Facenet"
     for face in faces:
         """
@@ -20,12 +23,16 @@ def DeepFaceRecog(faces, image):
         #그 부분은 구현 x
         result = DeepFace.verify("data:image/jpeg;base64,"+face.image_base64,
                                    "data:image/jpeg;base64,"+image,
-                                 model_name=model_name, detector_backend=backends[4])
-        print(result)
+                                 model_name=model_name,
+                                 detector_backend='skip',
+                                 #normalization='Facenet',
+                                 )
+        print(face.profile.nick_name, result)
         if result['verified']:
             true_face_dict[face] = result['distance']
     if true_face_dict:
         verified_face = min(true_face_dict.keys(), key=(lambda k: true_face_dict[k]))
+        print(time.time() - start)
         return verified_face.profile
     else:
         return None
