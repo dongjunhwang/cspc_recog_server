@@ -12,3 +12,4 @@ cspc_recog_server/**/migrations/
 !cspc_recog_server/**/migrations/__init__.py
 
 venv/
+media/
