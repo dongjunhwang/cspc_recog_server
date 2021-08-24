@@ -1,4 +1,6 @@
-import datetime
+from datetime import datetime
+from pytz import timezone
+
 from users.models import Profile
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -14,14 +16,17 @@ class FaceRecog(APIView):
         # TODO : Group 별로 분리
         jsonData = request.data[0]
         image = jsonData['image']
+
+
         try:
             faces = Face.objects.all()
             profile = DeepFaceRecog(faces, image)
             if profile.is_online:
-                # 누적 visit time 저장
-                profile.visit_time_sum += datetime.datetime.now() - profile.last_visit_time
+                    # 누적 visit time 저장
+                profile.visit_time_sum += datetime.now(timezone('Asia/Seoul')) - profile.last_visit_time
                 profile.is_online = False
             else:
+                profile.last_visit_time = datetime.now()
                 profile.is_online = True
             profile.save()
             data = {
