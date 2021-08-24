@@ -14,3 +14,4 @@ cspc_recog_server/**/migrations/
 
 venv/
 .deepface
+media/
