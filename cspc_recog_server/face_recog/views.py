@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from pytz import timezone
 
 from users.models import Profile
@@ -20,28 +20,30 @@ class FaceRecog(APIView):
 
         faces = Face.objects.all()
         profile = DeepFaceRecog(faces, image)
-        if profile.is_online:
-            # 누적 visit time 저장
-            profile.visit_time_sum += datetime.now(timezone('Asia/Seoul')) - profile.last_visit_time
-            profile.is_online = False
+        if profile:
+            current_visit_time = datetime.now(timezone('Asia/Seoul')) - profile.last_visit_time
+            if current_visit_time > timedelta(seconds=20):#20초 안에 또 나가면 퇴실처리 안됨.
+                if profile.is_online:
+                    # 누적 visit time 저장
+                    profile.visit_time_sum += current_visit_time
+                    profile.is_online = False
+                else:
+                    profile.last_visit_time = datetime.now()
+                    profile.is_online = True
+                profile.save()
+                data = {
+                    "username": profile.user_id.username,
+                    "isOnline": int(profile.is_online),
+                    "response": 1 #입실 혹은 퇴실에 성공했습니다.
+                }
+                return JsonResponse(data, status=200)
+            else:
+                data = {"response": 2} # 좀 있다가 퇴실하세요
+                return JsonResponse(data, status=200)
         else:
-            profile.last_visit_time = datetime.now()
-            profile.is_online = True
-        profile.save()
-        data = {
-            "username": profile.user_id.username,
-            "isOnline": int(profile.is_online),
-            "response": 1
-        }
-        return JsonResponse(data, status=200)
-        # TODO : 완벽하게 만들어서 배포할 때 까지  try except 키지 말기
-        """
-        except:
-            data = {
-                "response": 0
-            }
-            return Response(data, status=404)
-        """
+            data = {"response": 0} # 얼굴을 추가하세요 얼굴이 없네요
+            return JsonResponse(data, status=200)
+        return Response(status=404)
 
 
 class FaceAdd(APIView):

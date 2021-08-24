@@ -24,7 +24,8 @@ def DeepFaceRecog(faces, image):
         result = DeepFace.verify("data:image/jpeg;base64,"+face.image_base64,
                                    "data:image/jpeg;base64,"+image,
                                  model_name=model_name,
-                                 detector_backend='skip',
+                                 detector_backend='retinaface',
+                                 #detector_backend='skip',
                                  #normalization='Facenet',
                                  )
         print(face.profile.nick_name, result)
