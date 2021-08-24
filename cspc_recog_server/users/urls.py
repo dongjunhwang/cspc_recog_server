@@ -8,8 +8,8 @@ urlpatterns = [
     path("auth/login/", LoginAPI.as_view()),
     path("auth/user/", UserAPI.as_view()),
 
-    path("auth/profile/<int:id>/update/", ProfileUpdateAPI.as_view()),
-    path("auth/group/<int:id>/update/", GroupUpdateAPI.as_view()),
+    path("auth/profile/<int:pk>/update/", ProfileUpdateAPI.as_view()),
+    path("auth/group/<int:pk>/update/", GroupUpdateAPI.as_view()),
 
     path("auth/profile/create", ProfileCreateAPI.as_view()),
     path("auth/group/create", GroupCreateAPI.as_view()),
