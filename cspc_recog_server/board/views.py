@@ -6,8 +6,8 @@ from rest_framework import viewsets, permissions, generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
-from .models import Post, Comment, PostImage
-from .serializers import PostSerializer, CommentSerializer, PostListSerializer, LikeSerializer, PostImageSerializer
+from .models import Post, Comment, PostImage, Board
+from .serializers import PostSerializer, CommentSerializer, LikeSerializer, PostImageSerializer, BoardSerializer
 import json
 # Create your views here.
 
@@ -34,8 +34,16 @@ class PostList(APIView):
                     post.save()
                     image_flag = True
                 PostImage.objects.create(post_id=post.id, image=image)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+            return Response(data=post.id, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class PostAPI(APIView):
+    # 게시물 목록 받아오기
+    def get(self, request, pk):
+        post = Post.objects.get(id=pk)
+        serializer = PostSerializer(post)
+        return Response(serializer.data)
 
 class PostImageAPI(APIView):
     def get(self, request, pk):
@@ -57,6 +65,7 @@ class PostLike(APIView):
         # 이미 좋아요를 누른 profile이면 좋아요 삭제
         if post.like_members.filter(id=profile).exists():
             #print("삭제")
+            post.like_count -= 1
             post.like_members.remove(profile)
         else:
             #print("추가")
@@ -65,26 +74,46 @@ class PostLike(APIView):
         post.save()
         return Response()
 
-@api_view(['GET'])
-def PostAPI(request):
-    all_post = Post.objects.all()
-    serializer = PostListSerializer(all_post, many = True)
-    return Response(serializer.data)
+class CommentAPI(APIView):
+    #pk 게시글의 댓글 목록 가져오기
+    def get(self,request,pk):
+        try:
+            # pk(인스턴스의 id)값을 받아 어떤 인스턴스인지 특정
+            # url slug로 pk값을 받도록 urls.py에서 설정해준다.
+            comments = Comment.objects.filter(post_id=pk)
+            # 받은 pk값으로 조회했을 때 해당하는 인스턴스가 없다면 출력할 에러 코드와 메시지를 설정한다.
+        except Comment.DoesNotExist:
+            return Response({'error': {
+                'code': 404,
+                'message': "Comment not found!"
+            }}, status=status.HTTP_404_NOT_FOUND)
 
-@api_view(['GET'])
-def CommentAPI(request,pk):
+        # comments = comment.objects.filter(post_id = pk)
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
 
-    try:
-        # pk(인스턴스의 id)값을 받아 어떤 인스턴스인지 특정
-        # url slug로 pk값을 받도록 urls.py에서 설정해준다.
-        comments = Comment.objects.filter(post_id=pk)
-        # 받은 pk값으로 조회했을 때 해당하는 인스턴스가 없다면 출력할 에러 코드와 메시지를 설정한다.
-    except Comment.DoesNotExist:
-        return Response({'error': {
-            'code': 404,
-            'message': "Comment not found!"
-        }}, status=status.HTTP_404_NOT_FOUND)
+    #게시글에 댓글 올리기
+    #post_id, author, contents 필요
+    def post(self,request,pk):
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    #comments = comment.objects.filter(post_id = pk)
-    serializer = CommentSerializer(comments, many = True)
-    return Response(serializer.data)
+
+class BoardAPI(APIView):
+    #group_id에 해당하는 board 목록 가져오기
+    def get(self,request,pk):
+        all_board = Board.objects.filter(group_id = pk)
+        serializer = BoardSerializer(all_board, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    #보드 생성
+    #group_id, board_name 필요
+    def post(self,request):
+        serializer = BoardSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
