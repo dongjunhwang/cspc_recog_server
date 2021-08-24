@@ -1,3 +1,4 @@
+import datetime
 from users.models import Profile
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -17,6 +18,8 @@ class FaceRecog(APIView):
             faces = Face.objects.all()
             profile = DeepFaceRecog(faces, image)
             if profile.is_online:
+                # 누적 visit time 저장
+                profile.visit_time_sum += datetime.datetime.now() - profile.last_visit_time
                 profile.is_online = False
             else:
                 profile.is_online = True

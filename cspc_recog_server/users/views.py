@@ -3,10 +3,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import ProfileSerializer
 from rest_framework import status , permissions, generics, status
-from .models import Profile
 from knox.models import AuthToken
-from .serializers import CreateUserSerializer, UserSerializer, LoginUserSerializer
-from .models import Profile
+from .serializers import CreateUserSerializer, UserSerializer, LoginUserSerializer, ProfileSerializer, GroupSerializer
+from .models import Profile, Group
 
 
 class UserView(APIView):
@@ -43,6 +42,7 @@ class RegistrationAPI(generics.GenericAPIView):
         )
 
 
+
 class LoginAPI(generics.GenericAPIView):
     serializer_class = LoginUserSerializer
 
@@ -50,15 +50,17 @@ class LoginAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
+        profile_list = ProfileSerializer(
+                Profile.objects.filter(user_id = user), many=True)
         return Response(
             {
                 "user": UserSerializer(
                     user, context=self.get_serializer_context()
                 ).data,
                 "token": AuthToken.objects.create(user)[1],
+                "profile" : profile_list.data,
             }
         )
-
 
 class UserAPI(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -67,3 +69,19 @@ class UserAPI(generics.RetrieveAPIView):
     def get_object(self):
         return self.request.user
 
+class ProfileCreateAPI(generics.CreateAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+
+class GroupCreateAPI(generics.CreateAPIView):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+
+
+class ProfileUpdateAPI(generics.UpdateAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+
+class GroupUpdateAPI(generics.UpdateAPIView):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
