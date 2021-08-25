@@ -5,11 +5,13 @@ myvenv
 db.sqlite3
 /static
 .DS_Store
-
+.idea
 /media
+
 
 cspc_recog_server/**/migrations/
 !cspc_recog_server/**/migrations/__init__.py
 
 venv/
+.deepface
 media/
