@@ -10,7 +10,8 @@ class Board(models.Model):
 class Post(models.Model):
     board_id = models.ForeignKey(Board, on_delete=models.CASCADE, related_name='board',default='')
     title = models.CharField(max_length=50,null = False)
-    author = models.CharField(max_length=10,null = False)
+    #author = models.CharField(max_length=10,null = False)
+    author = models.ForeignKey(Profile, on_delete=models.CASCADE)
     contents = models.TextField(null = False)
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
@@ -25,7 +26,8 @@ class PostImage(models.Model):
 
 class Comment(models.Model):
     post_id = models.ForeignKey(Post, on_delete=models.CASCADE)
-    author = models.CharField(max_length=10, null=False)
+    #author = models.CharField(max_length=10, null=False)
+    author = models.ForeignKey(Profile, on_delete=models.CASCADE)
     contents = models.TextField(null = False)
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
