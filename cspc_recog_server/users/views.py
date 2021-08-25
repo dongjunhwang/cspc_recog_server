@@ -62,6 +62,16 @@ class LoginAPI(generics.GenericAPIView):
             }
         )
 
+
+class LogoutAPI(APIView):
+    #serializer_class = LoginUserSerializer
+
+    def get(self, request, *args, **kwargs):
+        request.user.auth_token.delete()
+
+        return Response(status=status.HTTP_200_OK)
+
+
 class UserAPI(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
