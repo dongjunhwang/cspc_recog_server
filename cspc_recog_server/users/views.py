@@ -52,6 +52,7 @@ class LoginAPI(generics.GenericAPIView):
         user = serializer.validated_data
         profile_list = ProfileSerializer(
                 Profile.objects.filter(user_id = user), many=True)
+
         return Response(
             {
                 "user": UserSerializer(
@@ -64,8 +65,6 @@ class LoginAPI(generics.GenericAPIView):
 
 
 class LogoutAPI(APIView):
-    #serializer_class = LoginUserSerializer
-
     def get(self, request, *args, **kwargs):
         request.user.auth_token.delete()
 
