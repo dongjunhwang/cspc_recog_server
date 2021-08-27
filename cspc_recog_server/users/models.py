@@ -8,7 +8,6 @@ def profileImageUpload(instance, filename):
 
 class Group(models.Model):
     group_name = models.CharField(max_length=100)
-    #group_admin_id = models.ForeignKey(Profile,on_delete=models.CASCADE)
     group_admin_id = models.ForeignKey(User,on_delete=models.CASCADE)
 
     def __str__(self):
