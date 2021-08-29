@@ -15,8 +15,6 @@ class GroupSerializer(serializers.ModelSerializer):
         fields = '__all__'
         # Group의 모든 field를 serializer함.
 
-
-
 class CreateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
