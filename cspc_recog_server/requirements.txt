@@ -76,4 +76,3 @@ win32-setctime==1.0.3
 wrapt==1.12.1
 django-rest-knox==4.1.0
 Pillow==8.3.1
->>>>>>> f5efe20afa80b25802c2cdaf4e97ecd6732a4b7d
