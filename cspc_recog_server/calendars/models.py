@@ -8,5 +8,6 @@ class Event(models.Model):
     calendar_id = models.ForeignKey(Calendar,on_delete=models.CASCADE)
 
     title = models.CharField(max_length=50, null = False)
-    description = models.TextField(null = True)
-    date = models.DateTimeField(auto_now = False)
+    description = models.TextField(null = True, blank=True)
+    start_date = models.DateTimeField(auto_now = False)
+    end_date = models.DateTimeField(auto_now = False)

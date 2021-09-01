@@ -50,10 +50,16 @@ def verify(img1_path, img2_path = '',
 		   enforce_detection = True,
 		   detector_backend = 'opencv',
 		   align = True, prog_bar = True,
-		   normalization = 'base'):
+		   normalization = 'base',
+		   represent_option = 'preprocess',
+		   img1_embedding = None,
+		   img2_embedding = None):
+	# represent option preprocess = only return img1_representation
+	# predict = calculate embedding metrics
 	tic = time.time()
 
-	img_list, bulkProcess = functions.initialize_input(img1_path, img2_path)
+	if represent_option == 'preprocess':
+		img_list, bulkProcess = functions.initialize_input(img1_path, img2_path)
 
 	resp_objects = []
 
@@ -86,30 +92,25 @@ def verify(img1_path, img2_path = '',
 				custom_model = models[i]
 
 				#img_path, model_name = 'VGG-Face', model = None, enforce_detection = True, detector_backend = 'mtcnn'
-				img1_representation = represent(img_path = img1_path
-						, model_name = model_name, model = custom_model
-						, enforce_detection = enforce_detection, detector_backend = detector_backend
-						, align = align
-						, normalization = normalization
-						)
-
-				img2_representation = represent(img_path = img2_path
-						, model_name = model_name, model = custom_model
-						, enforce_detection = enforce_detection, detector_backend = detector_backend
-						, align = align
-						, normalization = normalization
-						)
+				if represent_option == 'preprocess':
+					img_representation = represent(img_path = img1_path
+							, model_name = model_name, model = custom_model
+							, enforce_detection = enforce_detection, detector_backend = detector_backend
+							, align = align
+							, normalization = normalization
+							)
+					return img_representation
 
 				#----------------------
 				#find distances between embeddings
 
 				for j in metrics:
 					if j == 'cosine':
-						distance = dst.findCosineDistance(img1_representation, img2_representation)
+						distance = dst.findCosineDistance(img1_embedding, img2_embedding)
 					elif j == 'euclidean':
-						distance = dst.findEuclideanDistance(img1_representation, img2_representation)
+						distance = dst.findEuclideanDistance(img1_embedding, img2_embedding)
 					elif j == 'euclidean_l2':
-						distance = dst.findEuclideanDistance(dst.l2_normalize(img1_representation), dst.l2_normalize(img2_representation))
+						distance = dst.findEuclideanDistance(dst.l2_normalize(img1_embedding), dst.l2_normalize(img2_embedding))
 					else:
 						raise ValueError("Invalid distance_metric passed - ", distance_metric)
 
@@ -229,3 +230,22 @@ def detectFace(img_path, detector_backend = 'opencv', enforce_detection = True, 
 #main
 
 functions.initialize_folder()
+
+
+def customVerify(img1, img2, dist='cosine', threshold=0.4):
+	#print(img1, img1[0])
+	if dist == 'cosine':
+		distance = dst.findCosineDistance(img1, img2)
+	elif dist == 'euclidean':
+		distance = dst.findEuclideanDistance(img1, img2)
+	elif dist == 'euclidean_l2':
+		distance = dst.findEuclideanDistance(dst.l2_normalize(img1), dst.l2_normalize(img2))
+	else:
+		raise ValueError("Invalid distance_metric passed - ", dist)
+
+	if distance <= threshold:
+		identified = True
+	else:
+		identified = False
+
+	return identified, distance

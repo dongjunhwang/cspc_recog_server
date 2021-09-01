@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import FaceSerializer
 from .models import Face
-from .deepface import DeepFaceRecog
+from .deepface import DeepFaceRecog, DeepFaceAdd
 
 from django.contrib.auth.models import User
 from django.http import JsonResponse
@@ -56,8 +56,7 @@ class FaceAdd(APIView):
             user = User.objects.get(username=name) #request.user
             profile = user.profile.all()[0]
             #group을 아직 넘기지 않으므로 일단 첫번째 것만 가져오게 된다.
-
-            face =Face.objects.create(profile = profile, image_base64=image)
+            face =Face.objects.create(profile = profile, image=DeepFaceAdd(image))
             face_serializer = FaceSerializer(face)
             return Response(face_serializer.data, status=200)
         except Profile.DoesNotExist:
