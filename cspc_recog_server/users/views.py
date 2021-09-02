@@ -6,7 +6,7 @@ from rest_framework import status , permissions, generics, status
 from knox.models import AuthToken
 from .serializers import CreateUserSerializer, UserSerializer, LoginUserSerializer, ProfileSerializer, GroupSerializer
 from .models import Profile, Group
-
+from django.utils.datastructures import MultiValueDictKeyError
 
 class UserView(APIView):
     def get(self, request, **kwargs):
@@ -94,8 +94,20 @@ class GroupCreateAPI(generics.CreateAPIView):
 
 
 class ProfileUpdateAPI(generics.UpdateAPIView):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
+
+    def post(self, request, **kwargs):
+        try:
+            profile_id = kwargs.get('profile_id')
+            profile = Profile.objects.get(id = profile_id)
+            profile.nick_name = request.data['newNickName']
+            image = request.FILES['profileImage']
+            profile.profile_image = image
+            profile.save()
+        except MultiValueDictKeyError:
+            profile.save()
+
+        return Response( status=200)
+        
 
 class GroupUpdateAPI(generics.UpdateAPIView):
     queryset = Group.objects.all()
