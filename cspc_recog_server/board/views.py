@@ -15,7 +15,7 @@ class PostList(APIView):
 
     #게시물 목록 받아오기
     def get(self, request,pk):
-        all_post = Post.objects.filter(board_id = pk)
+        all_post = Post.objects.filter(board_id = pk).order_by('-created_date')
         serializer = PostSerializer(all_post, many=True)
         return Response(serializer.data)
 
@@ -39,17 +39,26 @@ class PostList(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class PostAPI(APIView):
-    # 게시물 목록 받아오기
+    # 게시물 하나 받아오기
     def get(self, request, pk):
         post = Post.objects.get(id=pk)
         serializer = PostSerializer(post)
         return Response(serializer.data)
+    # 게시글 삭제
+    def delete(self, request, pk):
+        if request.method == 'DELETE':
+            try:
+                Post.objects.filter(id=pk).delete()
+                return Response("deleted")
+            except:
+                return Response("delete fail")
 
 class PostImageAPI(APIView):
     def get(self, request, pk):
         post_iamge = PostImage.objects.filter(post_id = pk)
         serializer = PostImageSerializer(post_iamge, many=True)
         return Response(serializer.data)
+
 
 class PostLike(APIView):
     #좋아요 개수
