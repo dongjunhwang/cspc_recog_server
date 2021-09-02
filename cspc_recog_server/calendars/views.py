@@ -13,7 +13,7 @@ def calendarAPI(request):
 
 class EventAPIView(APIView):
     def get(self, request, pk):
-        all_event = Event.objects.filter(calendar_id = pk).order_by('date')
+        all_event = Event.objects.filter(calendar_id = pk).order_by('start_date')
         serializer = EventSerializer(all_event, many=True)
         return Response(serializer.data)
 
@@ -25,11 +25,11 @@ class EventAPIView(APIView):
             request_data = json.loads(request.body.decode('utf-8'))[0]
             title = request_data['title']
             description = request_data['description']
-            date = request_data['date']
+            start_date = request_data['start_date']
+            end_date = request_data['end_date']
             
             event = Event(calendar_id = calendar_id,
-            title = title, description = description, date = date
-            )
+            title = title, description = description, start_date = start_date, end_date = end_date)
             event.save()
             
             return Response(True)
@@ -47,7 +47,8 @@ class EventAPIView(APIView):
             request_data = json.loads(request.body.decode('utf-8'))[0]
             event.title = request_data['title']
             event.description = request_data['description']
-            event.date = request_data['date']
+            event.start_date = request_data['start_date']
+            event.end_date = request_data['end_date']
             
             event.save()
 
