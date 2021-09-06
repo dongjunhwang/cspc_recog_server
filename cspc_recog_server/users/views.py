@@ -32,11 +32,9 @@ class RegistrationAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+
         return Response(
             {
-                "user": UserSerializer(
-                    user, context=self.get_serializer_context()
-                ).data,
                 "token": AuthToken.objects.create(user)[1],
             }
         )
@@ -51,19 +49,9 @@ class LoginAPI(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
 
-        print(type(user))
-        print(user)
-
-        profile_list = ProfileSerializer(
-                Profile.objects.filter(user_id = user), many=True)
-
         return Response(
             {
-                "user": UserSerializer(
-                    user, context=self.get_serializer_context()
-                ).data,
                 "token": AuthToken.objects.create(user)[1],
-                "profile" : profile_list.data,
             }
         )
 
@@ -86,22 +74,14 @@ class ProfileAPI(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         profile_list = ProfileSerializer(
                 Profile.objects.filter(user_id = request.data["user_id"]), many=True)
-        return Response(
-            {
-                "profile": profile_list.data,
-            }
-        )
+        return Response(profile_list.data, status=200)
+
 
 class GroupAPI(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         group_list = GroupSerializer(
                 Group.objects.filter(group_admin_id = request.data["user_id"]), many=True)
-        return Response(
-            {
-                "Group": group_list.data,
-            }
-        )
-
+        return Response(group_list.data, status=200)
 
 
 class ProfileCreateAPI(generics.CreateAPIView):
