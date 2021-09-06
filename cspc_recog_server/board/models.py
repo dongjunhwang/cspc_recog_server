@@ -4,13 +4,12 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class Board(models.Model):
-    board_name = models.CharField(max_length=30)
+    board_name = models.CharField(max_length=10)
     group_id = models.ForeignKey(Group,on_delete=models.CASCADE)
 
 class Post(models.Model):
     board_id = models.ForeignKey(Board, on_delete=models.CASCADE, related_name='board',default='')
-    title = models.CharField(max_length=50,null = False)
-    #author = models.CharField(max_length=10,null = False)
+    title = models.CharField(max_length=30,null = False)
     author = models.ForeignKey(Profile, on_delete=models.CASCADE)
     contents = models.TextField(null = False)
     created_date = models.DateTimeField(auto_now_add=True)

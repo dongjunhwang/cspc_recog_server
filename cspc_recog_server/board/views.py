@@ -110,6 +110,14 @@ class CommentAPI(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['DELETE'])
+def CommentDelete(request,pk):
+    try:
+        Comment.objects.filter(id=pk).delete()
+        return Response("deleted")
+    except:
+        return Response("delete fail")
+
 
 class BoardAPI(APIView):
     #group_id에 해당하는 board 목록 가져오기
