@@ -6,8 +6,10 @@ from rest_framework import viewsets, permissions, generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
+from rest_framework.parsers import JSONParser
 from .models import Post, Comment, PostImage, Board
 from .serializers import PostSerializer, CommentSerializer, LikeSerializer, PostImageSerializer, BoardSerializer
+from django.core.paginator import Paginator
 import json
 # Create your views here.
 
@@ -15,9 +17,15 @@ class PostList(APIView):
 
     #게시물 목록 받아오기
     def get(self, request,pk):
-        all_post = Post.objects.filter(board_id = pk)
-        serializer = PostSerializer(all_post, many=True)
-        return Response(serializer.data)
+        all_post = Post.objects.filter(board_id = pk).order_by('-created_date')
+        page = request.GET.get('page','1')
+        paginator = Paginator(all_post,'10')
+        print(paginator.num_pages)
+        page_obj = paginator.page(page)
+        serializer = PostSerializer(page_obj, many=True)
+        if(int(page) >= paginator.num_pages):
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     #게시물 생성
     #board_id, id, title, author, contents 필요
@@ -39,17 +47,46 @@ class PostList(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class PostAPI(APIView):
-    # 게시물 목록 받아오기
+    # 게시물 하나 받아오기
     def get(self, request, pk):
         post = Post.objects.get(id=pk)
         serializer = PostSerializer(post)
         return Response(serializer.data)
+    # 게시글 삭제
+    def delete(self, request, pk):
+        if request.method == 'DELETE':
+            try:
+                Post.objects.filter(id=pk).delete()
+                return Response("deleted")
+            except:
+                return Response("delete fail")
+
+    #게시글 수정
+    def put(self,request, pk):
+        if(request.method == 'PUT'):
+            post = Post.objects.get(id=pk)
+            '''print('제목'+post.title)
+            request_data = JSONParser().parse(request.body)
+            print(request_data['title'])
+            if 'title' in request_data:
+                post.title = request_data['title']
+            if 'contents' in request_data:
+                post.contents = request_data['contents']
+            post.save()'''
+            serializer = PostSerializer(post, data = request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status = status.HTTP_200_OK)
+            else :
+                return Response(status = status.HTTP_400_BAD_REQUEST)
+            #return Response("invalid request", status = status.HTTP_400_BAD_REQUEST)
 
 class PostImageAPI(APIView):
     def get(self, request, pk):
         post_iamge = PostImage.objects.filter(post_id = pk)
         serializer = PostImageSerializer(post_iamge, many=True)
         return Response(serializer.data)
+
 
 class PostLike(APIView):
     #좋아요 개수
@@ -100,6 +137,14 @@ class CommentAPI(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE'])
+def CommentDelete(request,pk):
+    try:
+        Comment.objects.filter(id=pk).delete()
+        return Response("deleted")
+    except:
+        return Response("delete fail")
 
 
 class BoardAPI(APIView):
