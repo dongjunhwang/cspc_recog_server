@@ -2,18 +2,20 @@ from rest_framework import serializers
 from .models import Group, Profile
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-
-class ProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Profile
-        fields = '__all__'
-        # Profile의 모든 field를 serializer함.
-
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = '__all__'
         # Group의 모든 field를 serializer함.
+
+class ProfileSerializer(serializers.ModelSerializer):
+    group_id = GroupSerializer()
+    class Meta:
+        model = Profile
+        fields = '__all__'
+        # Profile의 모든 field를 serializer함.
+
+
 
 class CreateUserSerializer(serializers.ModelSerializer):
     class Meta:
