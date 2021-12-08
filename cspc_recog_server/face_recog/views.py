@@ -14,8 +14,7 @@ from django.http import JsonResponse
 class FaceRecog(APIView):
     def post(self, request):
         # TODO : Group 별로 분리
-        jsonData = request.data[0]
-        image = jsonData['image']
+        image = request.POST.get('image')
 
 
         faces = Face.objects.all()
@@ -49,9 +48,9 @@ class FaceRecog(APIView):
 class FaceAdd(APIView):
     def post(self,request):
         #print(type(request.data[0]))
-        jsonData = request.data[0]
-        name =jsonData['username']
-        image = jsonData['image']
+        jsonData = request.POST
+        name =jsonData.get('username')
+        image = jsonData.get('image')
         try:
             user = User.objects.get(username=name) #request.user
             profile = user.profile.all()[0]
