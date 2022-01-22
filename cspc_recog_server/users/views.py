@@ -112,3 +112,23 @@ class ProfileUpdateAPI(generics.UpdateAPIView):
 class GroupUpdateAPI(generics.UpdateAPIView):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+
+class ProfileAPI(generics.GenericAPIView):
+    def post(self, request, *args, **kwargs):
+        profile_list = ProfileSerializer(
+                Profile.objects.filter(user_id = request.data["user_id"]), many=True)
+        return Response(
+            {
+                "profile": profile_list.data,
+            }
+        )
+
+class GroupAPI(generics.GenericAPIView):
+    def post(self, request, *args, **kwargs):
+        group_list = GroupSerializer(
+                Group.objects.filter(group_admin_id = request.data["user_id"]), many=True)
+        return Response(
+            {
+                "Group": group_list.data,
+            }
+        )

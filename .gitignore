@@ -7,7 +7,10 @@ db.sqlite3
 .DS_Store
 .idea
 /media
-
+uwsgi.ini
+wsgi.py
+uwsgi.py
+/log
 
 cspc_recog_server/**/migrations/
 !cspc_recog_server/**/migrations/__init__.py

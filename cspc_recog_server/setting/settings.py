@@ -24,11 +24,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-kpja%i5=vi^8q1!6w_2q6ydch%s%7l_p!6rx-j^4p!4fb4=%p='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 
 # ALLOWED_HOSTS = ['cocopam.hopto.org']
-ALLOWED_HOSTS = ['cocopam.hopto.org', '10.0.2.2', '127.0.0.1', ".ap-northeast-2.compute.amazonaws.com"]
+ALLOWED_HOSTS = ['api.cspc.me','cocopam.hopto.org', '10.0.2.2', '127.0.0.1', ".ap-northeast-2.compute.amazonaws.com"]
 
 
 # Application definition
