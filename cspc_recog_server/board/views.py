@@ -75,7 +75,13 @@ class PostAPI(APIView):
             post.save()'''
             serializer = PostSerializer(post, data = request.data)
             if serializer.is_valid():
-                serializer.save()
+                post = serializer.save()
+                images_data = request.FILES
+                PostImage.objects.filter(post=post).delete()
+                for image in images_data.getlist('image'):
+
+                    PostImage.objects.create(post_id=post.id, image=image)
+
                 return Response(status = status.HTTP_200_OK)
             else :
                 return Response(status = status.HTTP_400_BAD_REQUEST)
