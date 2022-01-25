@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import ProfileSerializer
 from rest_framework import status , permissions, generics, status
 from knox.models import AuthToken
 from .serializers import CreateUserSerializer, UserSerializer, LoginUserSerializer, ProfileSerializer, GroupSerializer
@@ -71,9 +70,9 @@ class UserAPI(generics.RetrieveAPIView):
         return self.request.user
 
 class ProfileAPI(generics.GenericAPIView):
-    def post(self, request, *args, **kwargs):
+    def get(self, request, id):
         profile_list = ProfileSerializer(
-                Profile.objects.filter(user_id = request.data["user_id"]), many=True)
+                Profile.objects.filter(user_id = id), many=True)
         return Response(profile_list.data, status=200)
 
 
@@ -84,9 +83,14 @@ class GroupAPI(generics.GenericAPIView):
         return Response(group_list.data, status=200)
 
 
-class ProfileCreateAPI(generics.CreateAPIView):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
+class ProfileCreateAPI(APIView):
+    def post(self, request):
+        serializers = ProfileSerializer(data=request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data, status=status.HTTP_201_CREATED)
+        return Response(serializers.errors, status = status.HTTP_400_BAD_REQUEST)
+
 
 class GroupCreateAPI(generics.CreateAPIView):
     queryset = Group.objects.all()

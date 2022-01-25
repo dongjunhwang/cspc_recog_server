@@ -9,13 +9,15 @@ urlpatterns = [
     path('<int:profile_id>', UserView.as_view()),
     path('profile/update/<int:profile_id>',ProfileUpdateAPI.as_view()),
 
+    # 회원가입, 로그인, 로그아웃
     path("auth/register/", RegistrationAPI.as_view()),
     path("auth/login/", LoginAPI.as_view()),
-
     path("auth/logout/", knox_views.LogoutView.as_view(), name='knox_logout'),
 
+
     path("auth/user/", UserAPI.as_view()),
-    path("auth/user/profile/", ProfileAPI.as_view()),
+    #path("auth/user/profile/", ProfileAPI.as_view()),
+    path("auth/user/profile/<int:id>/", ProfileAPI.as_view()),
     path("auth/user/group/", GroupAPI.as_view()),
 
     path("auth/profile/<int:pk>/update/", ProfileUpdateAPI.as_view()),

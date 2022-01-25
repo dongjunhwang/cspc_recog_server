@@ -16,7 +16,7 @@ class Group(models.Model):
 
 class Profile(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='profile')
-    group_id = models.ForeignKey(Group, on_delete=models.CASCADE)
+    group_id = models.ForeignKey(Group, on_delete=models.CASCADE, default=1)
     nick_name = models.CharField(max_length=100)
     last_visit_time = models.DateTimeField(auto_now_add=True)
     visit_time_sum = models.DurationField(default=datetime.timedelta())
